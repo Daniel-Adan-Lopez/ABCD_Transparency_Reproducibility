@@ -1,0 +1,920 @@
+#########################################################################
+#########################################################################
+########Transparency and Reproducibility in the ABCD Study###############
+#######################analytic scripts##################################
+##########################1-12-2024######################################
+#########################Daniel Lopez####################################
+#######################lopdanie@ohsu.edu#################################
+
+
+#filtering out abstracts, research letters, and abstracts so they can 
+#be described separately from full-length articles. We also want to make
+#sure included articles conducted some form of analysi using ABCD data.
+
+#1. data wrangling
+ABCD_a <-  ABCD_Transparency_and_Reproducibility_Final %>% 
+  filter(Abstract == 'No')
+#18 abstracts
+
+ABCD_b <-  ABCD_a %>% 
+  filter(Research_Letter == 'No')
+#11 research letters
+
+ABCD_c <-  ABCD_b %>% 
+  filter(Methods_Paper == "No" )
+#84 methods papers
+
+ABCD_d <-  ABCD_c %>% 
+  filter(Duplicate == "No" )
+#15 duplicates
+
+ABCD_e <-  ABCD_d %>% 
+  filter(Statistical_Analysis == "Yes" )
+#2 did not analyze the ABCD data
+
+
+##################################################
+#2. Plotting individual variables to examine distributions
+count <- table(ABCD_e$Completeness_4)
+
+p <-     ggplot(ABCD_e, aes(x = Completeness_4)) +                
+  geom_bar(fill = "gray", color = "black", width = 0.5)+
+  geom_text(stat='count', aes(label=..count..), vjust=-1)+
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
+
+p+theme_classic() +  ggtitle("Level of completeness scores in papers that analyzed ABCD Study data (n=549)")+
+  xlab("Completeness Score")+theme(plot.title = element_text(hjust = 0.5, size=20), axis.title.x = element_text(size=16), axis.title.y = element_text(size=16))
+
+#####################################
+#3. Frequencies and proportions of response types for individual
+#   extraction items
+
+table(ABCD_e$Code_Shared) 
+166/549
+#30.23
+
+table(ABCD_e$Code_Link) 
+155/166
+#93.4%
+
+table(ABCD_e$Software_Used) 
+499/549
+#90.9%
+
+table(ABCD_e$Software_Version)
+123+376
+376/499
+#75.3
+
+table(ABCD_e$ABCD_Version)
+116+433
+433/549
+#78.9%
+
+table(ABCD_e$ABCD_DOI)
+255+294
+294/549
+#53.6%
+
+table(ABCD_e$ABCD_Visits)
+111+438
+438/549
+#79.8%
+
+table(ABCD_e$Table_One)
+453+96
+453/549
+#82.5%
+
+table(ABCD_e$Number_Included)
+461+88
+461/549
+#84%
+
+table(ABCD_e$Number_Excluded)
+170+52+327
+327/549
+#59.6
+
+table(ABCD_e$Excluded_Demographics)
+286+49+214
+214/549
+#38.98%
+
+286+214
+214/500
+#42.8%
+
+table(ABCD_e$Proportion_MissingData)
+343+206
+206/549
+#37.5
+
+table(ABCD_e$Missing_Mechanism)
+459+90
+90/549
+#16.4
+
+table(ABCD_e$Data_Imputation)
+413+136
+136/549
+#24.8%
+
+table(ABCD_e$Proportion_MissingData, ABCD_e$Data_Imputation)
+283+60+130+76
+76/206
+#36.9%
+
+table(ABCD_e$Missing_Mechanism, ABCD_e$Data_Imputation)
+378+81+35+55
+55/90
+61.1%
+
+table(ABCD_e$Race_Included)
+123+426
+426/549
+#77.6%
+
+table(ABCD_e$Explanation_Race)
+252+174
+174/426
+#40.84
+
+table(ABCD_e$HHIncome_Included)
+182+367
+367/549
+#66.8%
+
+table(ABCD_e$Explanation_HHIncome)
+160/367
+#43.6%
+
+table(ABCD_e$Sex_Included)
+50+499
+499/549
+#90.9
+
+table(ABCD_e$Explanation_Sex)
+325+175
+175/500
+#35%
+
+table(ABCD_e$Age_Included)
+102+447
+447/549
+#81.4%
+
+table(ABCD_e$Explanation_Age)
+185+262
+185/447
+#41.4%
+
+table(ABCD_e$Data_Manipulation)
+285+264
+264/549
+#48.1%
+
+table(ABCD_e$Reason_Manipulation)
+161+103
+161/264
+#61%
+
+table(ABCD_e$Effect_EstimateReported)
+95+454
+454/549
+#82.7%
+
+table(ABCD_e$Uncertainty_Parameter)
+65+389
+389/454
+#85.7%
+
+table(ABCD_e$Pvalue_Reported)
+54+495
+495/549
+#90.2%
+
+table(ABCD_e$Multiple_Comparisons)
+292+257
+257/549
+#46.8%
+
+table(ABCD_e$Multiple_Correction)
+232+25
+232/257
+#90.3%
+
+table(ABCD_e$Sensitivity_Analysis)
+359+190
+190/549
+#34.6%
+
+table(ABCD_e$Goodness_Fit)
+395+154
+154/549
+#28.1%
+
+table(ABCD_e$Potential_Outliers)
+447+102
+102/549
+#18.6%
+
+table(ABCD_e$Skewed_Data)
+472+77
+77/549
+#14%
+
+table(ABCD_e$Imaging_Used)
+258+291
+291/549
+#53%
+
+table(ABCD_e$ROI_Rationale)
+1+1+1+85+1+1+1+1+1+174
+267+24
+267/291
+#91.8%
+
+table(ABCD_e$Imaging_Used, ABCD_e$Genetics_Used)
+220+38+241+50
+50/549
+#9.1%
+
+table(ABCD_e$Machine_Learning)
+482+67
+67/549
+#12.2
+
+table(ABCD_e$Machine_Learning, ABCD_e$Imaging_Used)
+51/67
+#76.1%
+
+table(ABCD_e$DEAP_Used)
+504+45
+45/549
+#8.2%
+
+table(ABCD_e$Generalizability_Limitation)
+388+70+91
+388+91
+91/479
+
+table(ABCD_e$Number_Excluded, ABCD_e$Generalizability_Limitation)
+128+22+20+19+31+2+241+17+69  
+241+17+69
+69/241
+#28.6%
+
+table(ABCD_e$Author_Contributions)
+293+256
+293/549
+#53.4%
+
+table(ABCD_e$Study_PreRegistered)
+502+47
+47/549
+#8.6%
+#########################################################
+#########################################################
+#the completeness variable was creating directly in excel.
+#the code was 
+#=SUM(G2:W2, Z2:AC2, AE2:AG2, AJ2:AK2, AM2, AO2:AQ2)
+#this encompassed summing up the following survey items:
+#1+1b+2+2b+3+4+5+6+7+8+9+10+11+13b+14b+15b+16b+18b+19+19b+
+#20+21b+22+23+25+26+30+31
+#possible score range is 0 to 28.
+
+summary(ABCD_e$Completeness_4)
+#Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+#1.00   11.00   13.00   13.11   16.00   23.00 
+
+sd(ABCD_e$Completeness_4)
+#3.919868
+
+var(ABCD_e$Completeness_4)
+#15.36537
+
+#######################################################################
+#summarizing the means of LOC score for Abstracts and Research Letters
+ 
+abstracts <-  ABCD_Transparency_and_Reproducibility_Final %>% 
+  filter(Abstract == "Yes" )
+summary(abstracts$Completeness_4)
+#Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+#0.000   2.000   3.000   3.722   4.000  13.000
+
+
+researchletters <-  ABCD_Transparency_and_Reproducibility_Final %>% 
+  filter(Research_Letter == "Yes" )
+summary(researchletters$Completeness_4)
+# Min. 1st Qu.  Median    Mean  3rd Qu.   Max. 
+#0.000   8.000  10.000   8.636  10.000  12.000 
+
+ 
+##########################
+x0 <- lm(Completeness_4 ~ 1, data=ABCD_e)
+library("car")
+qqPlot(ABCD_e$Completeness_4)
+#residuals appear close to normally distributed
+
+#univariate linear regression
+x1 <- lm(Completeness_4 ~ Number_Excluded, data=ABCD_e)
+summary(x1)
+#Number_ExcludedNo participants were excluded  -0.6113     0.5232  -1.168    0.243    
+#Number_ExcludedYes                             4.1650     0.3122  13.342   <2e-16 ***
+confint(x1)
+# Number_ExcludedNo participants were excluded -1.639010  0.4163854
+# Number_ExcludedYes                            3.551786  4.7781654
+ 
+x2 <- lm(Completeness_4 ~ Proportion_MissingData, data=ABCD_e)
+summary(x2)
+#Proportion_MissingDataYes   4.0722     0.2988   13.63   <2e-16 ***
+confint(x2)
+#Proportion_MissingDataYes  3.485293  4.659206
+
+x3 <- lm(Completeness_4 ~ ABCD_Version, data=ABCD_e)
+summary(x3)
+#ABCD_VersionYes   3.8243     0.3762   10.17   <2e-16 ***
+confint(x3)
+#ABCD_VersionYes 3.085397  4.563285
+
+x4 <- lm(Completeness_4 ~ ABCD_Visits, data=ABCD_e)
+summary(x4)
+#ABCD_VisitsYes   3.4140     0.3905   8.742   <2e-16 ***
+confint(x4)
+#ABCD_VisitsYes 2.646852  4.181113
+
+x5 <- lm(Completeness_4 ~ DEAP_Used, data=ABCD_e)
+summary(x5)
+#DEAP_UsedYes  -1.9123     0.6049  -3.161  0.00166 ** 
+confint(x5)
+#DEAP_UsedYes -3.100562 -0.7240415
+
+##################################################### 
+#making a variable to separate out papers that did not 
+#use genetics or imaging data. 
+ABCD_e<- ABCD_e %>% 
+  mutate(Imaging_Genetics = case_when(
+    Imaging_Used == "Yes" & Genetics_Used == "Yes" ~ "Yes",
+    TRUE ~ "No"))
+
+##########################
+
+x6 <- lm(Completeness_4 ~ Imaging_Genetics, data=ABCD_e)
+summary(x6)
+#Imaging_GeneticsYes   0.1418     0.5820   0.244    0.808
+ABCD_e$Imaging_Genetics <- as.factor(ABCD_e$Imaging_Genetics)
+levels(ABCD_e$Imaging_Genetics)
+ABCD_e$Imaging_Genetics <- relevel(ABCD_e$Imaging_Genetics, ref="Yes")
+x7 <- lm(Completeness_4 ~ Imaging_Genetics, data=ABCD_e)
+summary(x7)
+#Imaging_GeneticsNo  -0.1418     0.5820  -0.244    0.808 
+confint(x7)
+#Imaging_GeneticsNo -1.28496  1.001352
+
+####################
+x6 <- lm(Completeness_4 ~ Machine_Learning, data=ABCD_e)
+summary(x6)
+#Machine_LearningYes  -0.4496     0.5112  -0.879     0.38 
+confint(x6)
+#Machine_LearningYes -1.453703  0.5545883
+
+x7 <- lm(Completeness_4 ~ Year_Published, data=ABCD_e)
+summary(x7)
+#Year_Published     0.8274     0.1419   5.830 9.46e-09 ***
+confint(x7)
+#Year_Published     0.5486268     1.106131
+
+x8 <- lm(Completeness_4 ~ Imaging_Used, data=ABCD_e)
+summary(x8)
+#Imaging_UsedYes   0.5972     0.3345   1.785   0.0748 .  
+confint(x8)
+#Imaging_UsedYes -0.05994407  1.254302
+
+x9 <- lm(Completeness_4 ~ Genetics_Used, data=ABCD_e)
+summary(x9)
+#Genetics_UsedYes   0.5173     0.4559   1.135    0.257   
+confint(x9)
+#Genetics_UsedYes -0.3782379  1.412748
+
+x10 <- lm(Completeness_4 ~ Code_Shared, data=ABCD_e)
+summary(x10)
+#Code_SharedYes   3.0357     0.3407    8.91   <2e-16 ***  
+confint(x10)
+#Code_SharedYes  2.366465  3.704944
+
+x11 <- lm(Completeness_4 ~ Code_Link, data=ABCD_e)
+summary(x11)
+#Code_LinkYes    3.458      1.145    3.02  0.00293 ** 
+confint(x11)
+#Code_LinkYes 1.197166  5.718963
+
+x12 <- lm(Completeness_4 ~ Software_Used, data=ABCD_e)
+summary(x12)
+#Software_UsedYes   3.3788     0.5638   5.993 3.74e-09 ***
+confint(x12)
+#Software_UsedYes 2.271401  4.486274
+
+x13 <- lm(Completeness_4 ~ Software_Version, data=ABCD_e)
+summary(x13)
+#Software_VersionYes   2.5951     0.3724   6.968 1.03e-11 ***
+confint(x13)
+#Software_VersionYes  1.863352  3.32684
+
+x14 <- lm(Completeness_4 ~ ABCD_DOI, data=ABCD_e)
+summary(x14)
+#ABCD_DOIYes   2.3092     0.3209   7.196 2.06e-12 ***
+confint(x14)
+#ABCD_DOIYes  1.678816  2.939512
+
+x15 <- lm(Completeness_4 ~ Table_One, data=ABCD_e)
+summary(x15)
+#Table_OneYes   2.7479     0.4249   6.467 2.21e-10 ***
+confint(x15)
+#Table_OneYes  1.913259  3.582464
+
+x16 <- lm(Completeness_4 ~ Data_Manipulation, data=ABCD_e)
+summary(x16)
+#Data_ManipulationYes   2.7557     0.3137   8.783   <2e-16 ***
+confint(x16)
+#Data_ManipulationYes  2.139403  3.37200
+
+x17 <- lm(Completeness_4 ~ Reason_Manipulation, data=ABCD_e)
+summary(x17)
+#Reason_ManipulationYes   1.4932     0.4263   3.502 0.000542 ***
+confint(x17)
+#Reason_ManipulationYes  0.6536514  2.33266
+
+x18 <- lm(Completeness_4 ~ Effect_EstimateReported, data=ABCD_e)
+summary(x18)
+#Effect_EstimateReportedYes   3.5457     0.4159   8.526   <2e-16 ***
+confint(x18)
+#Effect_EstimateReportedYes 2.728798  4.362646
+
+x19 <- lm(Completeness_4 ~ Uncertainty_Parameter, data=ABCD_e)
+summary(x19)
+#Uncertainty_ParameterYes   0.6303     0.4774    1.32    0.187
+confint(x19)
+#Uncertainty_ParameterYes -0.3078325  1.568422
+
+x20 <- lm(Completeness_4 ~ Excluded_Demographics, data=ABCD_e)
+summary(x20)
+#Excluded_DemographicsNo participants were excluded  -2.1619     0.5607  -3.856 0.000129 ***
+#Excluded_DemographicsYes                             2.5113     0.3278   7.661 8.44e-14 ***
+confint(x20)
+#Excluded_DemographicsNo participants were excluded -3.263300 -1.060520
+#Excluded_DemographicsYes                            1.867409  3.155139
+
+x21 <- lm(Completeness_4 ~ Age_Included, data=ABCD_e)
+summary(x21)
+#Age_IncludedYes   1.9306     0.4225   4.569 6.06e-06 ***
+confint(x21)
+#Age_IncludedYes  1.100584  2.760582
+
+x22 <- lm(Completeness_4 ~ Explanation_Age, data=ABCD_e)
+summary(x22)
+#Explanation_AgeYes   3.1732     0.3273   9.695   <2e-16 ***
+confint(x22)
+#Explanation_AgeYes  2.529974  3.816508
+
+x23 <- lm(Completeness_4 ~ Explanation_HHIncome, data=ABCD_e)
+summary(x23)
+#Explanation_HHIncomeYes   2.8502     0.3647   7.814 5.97e-14 ***
+confint(x23)
+#Explanation_HHIncomeYes  2.132881  3.567421
+
+x24 <- lm(Completeness_4 ~ Explanation_Race, data=ABCD_e)
+summary(x24)
+#Explanation_RaceYes   1.6175     0.3648   4.434 1.18e-05 ***
+confint(x24)
+#Explanation_RaceYes  0.9005593  2.334526
+
+x25 <- lm(Completeness_4 ~ Explanation_Sex, data=ABCD_e)
+summary(x25)
+#Explanation_SexYes   2.7077     0.3339    8.11 3.96e-15 ***
+confint(x25)
+#Explanation_SexYes  2.051747  3.363638
+
+x26 <- lm(Completeness_4 ~ Generalizability_Limitation, data=ABCD_e)
+summary(x26)
+#Generalizability_LimitationNo missing data/attrition  -2.5459     0.4845  -5.255 2.13e-07 ***
+#Generalizability_LimitationYes                         2.0068     0.4346   4.618 4.84e-06 ***
+confint(x26)
+#Generalizability_LimitationNo missing data/attrition -3.497631 -1.594269
+#Generalizability_LimitationYes                        1.153196  2.860398
+
+x27 <- lm(Completeness_4 ~ Goodness_Fit, data=ABCD_e)
+summary(x27)
+#Goodness_FitYes   2.6073     0.3557   7.331 8.29e-13 ***
+confint(x27)
+#Goodness_FitYes  1.908621  3.305911
+
+x28 <- lm(Completeness_4 ~ Data_Imputation, data=ABCD_e)
+summary(x28)
+#Data_ImputationYes   1.8853     0.3794   4.969 9.01e-07 ***
+confint(x28)
+#Data_ImputationYes  1.140041  2.630647
+
+x29 <- lm(Completeness_4 ~ Multiple_Comparisons, data=ABCD_e)
+summary(x29)
+#Multiple_ComparisonsYes   2.3882     0.3197   7.471 3.17e-13 ***
+confint(x29)
+#Multiple_ComparisonsYes  1.760246  3.016099
+
+x30 <- lm(Completeness_4 ~ Multiple_Correction, data=ABCD_e)
+summary(x30)
+#Multiple_CorrectionYes   1.3972     0.7364   1.897   0.0589 .
+confint(x30)
+#Multiple_CorrectionYes -0.05291128  2.847394
+
+x31 <- lm(Completeness_4 ~ Missing_Mechanism, data=ABCD_e)
+summary(x31)
+#Missing_MechanismYes   3.1098     0.4323   7.193 2.09e-12 ***
+confint(x31)
+#Missing_MechanismYes  2.260605  3.959003
+
+x32 <- lm(Completeness_4 ~ Number_Included, data=ABCD_e)
+summary(x32)
+#Number_IncludedYes   3.4885     0.4314   8.087 3.95e-15 ***
+confint(x32)
+#Number_IncludedYes 2.641143  4.335785
+
+x33 <- lm(Completeness_4 ~ Number_Excluded, data=ABCD_e)
+summary(x33)
+#Number_ExcludedNo participants were excluded  -0.6113     0.5232  -1.168    0.243    
+#Number_ExcludedYes                             4.1650     0.3122  13.342   <2e-16 ***
+confint(x33)
+#Number_ExcludedNo participants were excluded -1.639010  0.4163854
+#Number_ExcludedYes                            3.551786  4.7781654
+
+x34 <- lm(Completeness_4 ~ Pvalue_Reported, data=ABCD_e)
+summary(x34)
+#Pvalue_ReportedYes   2.8549     0.5489   5.201  2.8e-07 ***
+confint(x34)
+#Pvalue_ReportedYes 1.776725  3.93304
+
+x35 <- lm(Completeness_4 ~ Potential_Outliers, data=ABCD_e)
+summary(x35)
+#Potential_OutliersYes   2.2477     0.4197   5.356 1.26e-07 ***
+confint(x35)
+#Potential_OutliersYes  1.423314  3.072014
+
+x36 <- lm(Completeness_4 ~ Skewed_Data, data=ABCD_e)
+summary(x36)
+#Skewed_DataYes   2.7559     0.4676   5.894  6.6e-09 ***
+confint(x36)
+#Skewed_DataYes  1.837446  3.674441
+
+x37 <- lm(Completeness_4 ~ Proportion_MissingData, data=ABCD_e)
+summary(x37)
+#Proportion_MissingDataYes   4.0722     0.2988   13.63   <2e-16 ***
+confint(x37)
+#Proportion_MissingDataYes  3.485293  4.659206
+
+x38 <- lm(Completeness_4 ~ Sensitivity_Analysis, data=ABCD_e)
+summary(x38)
+#Sensitivity_AnalysisYes   3.2749     0.3229   10.14   <2e-16 ***
+confint(x38)
+#Sensitivity_AnalysisYes  2.640563  3.909269
+
+x39 <- lm(Completeness_4 ~ Study_PreRegistered, data=ABCD_e)
+summary(x39)
+#Study_PreRegisteredYes   2.6707     0.5875   4.546 6.74e-06 ***
+confint(x39)
+#Study_PreRegisteredYes  1.516708  3.824735
+
+x40 <- lm(Completeness_4 ~ DEAP_Used, data=ABCD_e)
+summary(x40)
+#DEAP_UsedYes  -1.9123     0.6049  -3.161  0.00166 **
+confint(x40)
+#DEAP_UsedYes -3.100562 -0.7240415
+
+x41 <- lm(Completeness_4 ~ Author_Contributions, data=ABCD_e)
+summary(x41)
+#Author_ContributionsYes   1.0353     0.3327   3.111  0.00196 ** 
+confint(x41)
+#Author_ContributionsYes  0.3816794  1.688846
+
+x42 <- lm(Completeness_4 ~ Imaging_Genetics, data=ABCD_e)
+summary(x42)
+#Imaging_GeneticsNo  -0.1418     0.5820  -0.244    0.808 
+confint(x42)
+#Imaging_GeneticsNo -1.28496  1.001352
+
+###################
+#sensitivity analysis using machine learning
+
+library(Boruta)
+#does not need to be numeric
+#will only include in the Boruta call the variables that make up the LOC score
+#need to address any NA prior. 
+
+str(ABCD_e)
+colSums(is.na(ABCD_Transparency_and_Reproducibility_Final))
+
+df <- ABCD_Transparency_and_Reproducibility_Final[1:549,c(6,11:48, 51:54, 60)]
+
+df$Year_Published <- as.character(df$Year_Published)
+df[1:43] <- lapply(df[1:43], factor)  ## as.factor() could also be used
+str(df)
+
+####################
+set.seed(123)
+Boruta_x <- Boruta(Completeness_4 ~ Code_Link+Code_Shared+Software_Used+Software_Version+ABCD_Version+ABCD_DOI+ABCD_Visits+Table_One+Number_Included+Number_Excluded+
+                     Excluded_Demographics+Proportion_MissingData+Missing_Mechanism+Explanation_Age+Explanation_HHIncome+Explanation_Race+Explanation_Sex+
+                     Data_Manipulation+Reason_Manipulation+Effect_EstimateReported+Uncertainty_Parameter+Pvalue_Reported+Multiple_Comparisons+Multiple_Correction
+                   +Sensitivity_Analysis+Goodness_Fit+Data_Imputation+DEAP_Used+Potential_Outliers+Skewed_Data+Imaging_Used+ROI_Rationale+Genetics_Used+Study_PreRegistered+
+                     Race_Included+HHIncome_Included+Sex_Included+Age_Included+Year_Published+Machine_Learning+Author_Contributions, data=df,doTrace=2, maxRuns=4000) 
+print(Boruta_x)
+attStats(Boruta_x)
+#                             meanImp  medianImp       minImp    maxImp    normHits  decision
+# Machine_Learning         0.1925483  0.1473608 -2.093581892  2.120064 0.000334672  Rejected
+# Author_Contributions     1.1072061  0.9277240 -0.382690919  2.627738 0.000334672  Rejected
+# Year_Published           6.5197581  6.5203606  3.225198088 10.125385 0.998995984 Confirmed
+# Age_Included             3.1621947  3.2028375 -0.411638320  5.858349 0.758366801 Confirmed
+# Sex_Included             4.7562528  4.7809819  1.132728862  7.497509 0.987282463 Confirmed
+# HHIncome_Included        4.2958704  4.3131730 -0.006295173  7.035901 0.957161981 Confirmed
+# Race_Included            3.6734373  3.6852327  0.952049591  6.956950 0.874497992 Confirmed
+# Study_PreRegistered      7.0424082  7.0569025  4.240733636  9.463047 1.000000000 Confirmed
+# Genetics_Used            2.4992476  2.5396139 -1.203459877  5.556976 0.532128514 Confirmed
+# ROI_Rationale            2.5750243  2.5944816 -0.692249335  6.118316 0.544511379 Confirmed
+# Imaging_Used             3.4920116  3.5110879  0.339885078  7.017765 0.829651941 Confirmed
+# Skewed_Data              7.9038163  7.9066067  4.979342828 10.405128 1.000000000 Confirmed
+# Potential_Outliers       8.5581642  8.5526908  5.743064411 11.046472 1.000000000 Confirmed
+# DEAP_Used                2.5514459  2.5580824 -1.011921716  5.914107 0.549531459 Confirmed
+# Data_Imputation          6.9808991  6.9974366  4.201270153  9.693804 1.000000000 Confirmed
+# Goodness_Fit            10.3150483 10.3172449  7.403687801 13.056038 1.000000000 Confirmed
+# Sensitivity_Analysis    16.4645486 16.4530384 14.292625171 19.966627 1.000000000 Confirmed
+# Multiple_Correction     10.4478598 10.4240313  7.804363655 13.101231 1.000000000 Confirmed
+# Multiple_Comparisons     8.4858977  8.4813014  5.640729196 10.822975 1.000000000 Confirmed
+# Pvalue_Reported          3.8563507  3.8734906  0.721090002  6.516437 0.900267738 Confirmed
+# Uncertainty_Parameter   14.3792975 14.3828718 11.465250067 16.844230 1.000000000 Confirmed
+# Effect_EstimateReported 12.6779762 12.6701587 10.071412226 15.152143 1.000000000 Confirmed
+# Reason_Manipulation     12.5981980 12.5914722 10.208201761 15.624334 1.000000000 Confirmed
+# Data_Manipulation       10.3678890 10.3698129  8.044969126 12.917381 1.000000000 Confirmed
+# Explanation_Sex         16.4688842 16.4657099 13.671358870 19.232151 1.000000000 Confirmed
+# Explanation_Race        12.6734481 12.6626606  9.968879731 16.125835 1.000000000 Confirmed
+# Explanation_HHIncome    16.9888687 16.9614576 14.589301461 19.823422 1.000000000 Confirmed
+# Explanation_Age         17.4540812 17.4316789 15.135183974 19.967070 1.000000000 Confirmed
+# Missing_Mechanism       10.1160937 10.1213475  7.924884749 12.727925 1.000000000 Confirmed
+# Proportion_MissingData  20.6635170 20.6544559 18.437869984 23.336505 1.000000000 Confirmed
+# Excluded_Demographics   13.7402241 13.7388197 11.454402367 16.442040 1.000000000 Confirmed
+# Number_Excluded         23.8902782 23.8762301 21.205961351 26.431632 1.000000000 Confirmed
+# Number_Included          9.0412940  9.0466265  6.648704070 11.282296 1.000000000 Confirmed
+# Table_One                8.7655989  8.7586546  6.078453313 11.435489 1.000000000 Confirmed
+# ABCD_Visits             11.7158642 11.6971817  9.169341404 14.499458 1.000000000 Confirmed
+# ABCD_DOI                10.7556019 10.7445886  8.105968906 13.398577 1.000000000 Confirmed
+# ABCD_Version            15.2144995 15.1965050 12.320925388 18.618191 1.000000000 Confirmed
+# Software_Version        14.9792329 14.9810457 12.216433534 18.089087 1.000000000 Confirmed
+# Software_Used            7.8448767  7.8543865  5.188971132 10.006107 1.000000000 Confirmed
+# Code_Shared             14.9103982 14.8919533 12.456020020 17.121067 1.000000000 Confirmed
+# Code_Link               16.2862299 16.2948159 13.320289727 19.237888 1.000000000 Confirmed
+
+boruta_signif <- names(Boruta_x$finalDecision[Boruta_x$finalDecision %in% c("Confirmed", "Tentative")]) 
+print(boruta_signif)
+
+plot(Boruta_x, cex.axis=.6, las=2, xlab="", main="Variable Importance")
+
+
+stats <- attStats(Boruta_x)
+
+write.csv(stats, file="stats.csv")
+
+#other stats using boruta
+
+getSelectedAttributes(Boruta_x, withTentative = F)
+
+bor <- TentativeRoughFix(Boruta_x)
+
+getNonRejectedFormula(Boruta_x)
+
+plot(Boruta_x, las = 2, cex.axis = 0.5) # cex.axis is used to reduce the font size
+
+#######
+#Figure 2 creation
+
+process_the_Boruta_data <- function(x, whichShadow=c(FALSE,FALSE,FALSE),
+                                    colCode=c('green','yellow','red','blue'),
+                                    col=NULL) {
+  if(is.null(x$ImpHistory))
+    stop('Importance history was not stored during the Boruta run.')
+  
+  #Removal of -Infs and conversion to a list
+  lz <- lapply(1:ncol(x$ImpHistory),
+               function(i) x$ImpHistory[is.finite(x$ImpHistory[,i]),i])
+  colnames(x$ImpHistory) -> names(lz)
+  
+  #Selection of shadow meta-attributes
+  numShadow <- sum(whichShadow)
+  lz[c(rep(TRUE,length(x$finalDecision)),whichShadow)] -> lz
+  
+  generateCol<-function(x,colCode,col,numShadow){
+    #Checking arguments
+    if(is.null(col) & length(colCode)!=4)
+      stop('colCode should have 4 elements.')
+    #Generating col
+    if(is.null(col)){
+      rep(colCode[4],length(x$finalDecision)+numShadow)->cc
+      cc[c(x$finalDecision=='Confirmed',rep(FALSE,numShadow))]<-colCode[1]
+      cc[c(x$finalDecision=='Tentative',rep(FALSE,numShadow))]<-colCode[2]
+      cc[c(x$finalDecision=='Rejected',rep(FALSE,numShadow))]<-colCode[3]
+      col=cc
+    }
+    return(col)
+  }
+  
+  #Generating color vector
+  col <- generateCol(x, colCode, col, numShadow)
+  
+  #Ordering boxes due to attribute median importance
+  ii<-order(sapply(lz,stats::median))
+  lz[ii] -> lz
+  col <- col[ii]
+  lz_df <- do.call(rbind.data.frame, lz)
+  df <- as.data.frame(t(lz_df))
+  names(df) <- names(lz)
+  rownames(df) <- NULL
+  return(df)
+}
+
+# Apply the function:
+clean_Bor.hvo <- process_the_Boruta_data(Boruta_x)
+
+# Plot the data:
+library(tidyverse)
+p<- clean_Bor.hvo %>%
+  pivot_longer(everything()) %>%
+  ggplot(aes(x = fct_reorder(name, value, median), y = value)) +
+  geom_boxplot() +
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_text(angle = 90,
+                                   vjust = 0.5))+
+  scale_x_discrete(labels=c("Genetics_Used" = "Genetics Used", "DEAP_Used"= "DEAP Used",
+                            "ROI_Rationale"="ROI Rationale", "Age_Included" = "Age Included",
+                            "Imaging_Used" = "Imaging Used", "Race_Included" = "Race Included",
+                            "Pvalue_Reported" = "P value", "HHIncome_Included" = "Income Included",
+                            "Sex_Included" = "Sex Included", "Year_Published"="Year Published", 
+                            "Data_Imputation" = "Imputation", "Study_PreRegistered"= "PreRegistered",
+                            "Software_Used"= "Software Used","Skewed_Data"= "Skewed Data", 
+                            "Multiple_Comparisons"= "Multiple Comparisons", "Potential_Outliers"=
+                              "Potential Outliers", "Table_One" = "Demo Table", "Number_Included" =
+                              "N included", "Missing_Mechanism" = "Missing Mechanism", "Goodness_Fit" = 
+                              "Goodness of Fit", "Data_Manipulation" = "Data Manipulation",
+                            "Multiple_Correction" = "Multiple Correction", "ABCD_DOI" = "ABCD DOI",
+                            "ABCD_Visits" = "ABCD Visits", "Reason_Manipulation" = "Manipulation Reason",
+                            "Explanation_Race"= "Race/ethnicity explained", "Effect_EstimateReported"=
+                              "Effect estimate", "Excluded_Demographics"= "Excluded Demographics", 
+                            "Uncertainty_Parameter" = "Uncertainty Parameter", "Code_Shared"="Code Shared",
+                            "Software_Version" = "Software Version", "ABCD_version" = "ABCD Version",
+                            "Code_Link" = "Active Code Link", "Explanation_Sex" = "Sex Explanation",
+                            "Sensitivity_Analysis" = "Sensitivity Analysis", "Explanation_HHIncome" =
+                              "Income Explanation", "Explanation_Age" = "Age Explanation", 
+                            "Proportion_MissingData" = "Proportion Missing Data", "Number_Excluded"=
+                              "N Excluded"))
+
+p + theme(axis.text.x = element_text(size=12, angle=90),
+          axis.text.y = element_text(size=12))
+
+
+
+###############################
+
+
+###############################################
+
+ABCD_e %>% 
+  group_by(LOC_CAT) %>% #specify the variable you want t
+  summarize(mean = mean(Impact_Factor, na.rm=TRUE),
+            #         summarize(median = median(age_visit_months, na.rm=TRUE),
+            (sd=sd(Impact_Factor, na.rm=TRUE)))
+ABCD_e$Impact_Factor <- as.numeric(ABCD_e$Impact_Factor)
+# LOC_CAT   mean `(sd = sd(Impact_Factor, na.rm = TRUE))`
+# <chr>    <dbl>                                    <dbl>
+# 1 High      9.51                                    13.5 
+# 2 Low       3.91                                     2.81
+# 3 Mid       7.23                                     5.26
+
+summary(ABCD_e$Impact_Factor)
+ABCD_e$Impact_Factor_Logged <- log(ABCD_e$Impact_Factor)
+x30 <- lm(Impact_Factor_Logged ~ LOC_CAT , data=ABCD_e)
+summary(x30)
+# LOC_CATLow  -0.76573    0.13048  -5.868 2.58e-08 ***
+# LOC_CATMid  -0.08114    0.13114  -0.619    0.537
+
+confint(x30)
+#LOC_CATLow  -1.023479 -0.5079735
+#LOC_CATMid  -0.340186  0.1779109
+
+x31 <- lm(Impact_Factor_Logged ~ Completeness_4 , data=ABCD_e)
+summary(x31)
+#Completeness_4 0.055655   0.009451   5.889 2.31e-08 ***
+confint(x31)
+#Completeness_4 0.03698641 0.07432432
+
+##################################
+
+#Code for Figure 2. Required using the proportions of each type of response
+#for each extraction item. This was done using Excel.
+
+ABCD_Transparency_Numeric$Response <- factor(ABCD_Transparency_Numeric$Response, levels=c("No participants excluded", "No missing data/attrition", "Conducted whole brain analysis", "No",
+ 
+
+#####May need to manually specify the level order for Question
+ABCD_Transparency_Numeric$Question <- factor(ABCD_Transparency_Numeric$Question, 
+                                             levels=c("ANALYSIS-LEVEL REPRODUCIBILITY", 
+                                                      "Code Shared (n=549)", "Code Link Works (n=166)", "Software Used (n=549)",
+                                                      "Software Version Specified (n=499)", "ABCD Version Included (n=549)",
+                                                      "ABCD DOI Included (n=549)", "ABCD Visits Specified (n=549)", 
+                                                      "ANALYTIC SAMPLES",
+                                                      "Demographic Table Included (n=549)", "Number Included Specified (n=549)",
+                                                      "Number Excluded Specified (n=549)", "Excluded Demographics (n=549)",
+                                                      "Proportion Missing Data (n=549)", "Missingness Mechanism (n=549)", 
+                                                      "Imputation used to account for missing data (n=549)",
+                                                      "ANALYTIC MODELS",
+                                                      "Included race and/or ethnicity (n=549)",
+                                                      "Explanation for race and/or ethnicity (n=426)", "Included household income (n=549)",
+                                                      "Explanation for household income (n=367)", "Included sex (n=549)", 
+                                                      "Explanation for sex (n=500)",  "Included age (n=549)", "Explanation for age (n=447)",
+                                                      "Description of data manipulation (n=549)",
+                                                      "Reason for data manipulation (n=264)", "Goodness of Fit Test (n=549)",
+                                                      "Potential outliers explored (n=549)", "Potential skewed data explored (n=549)",
+                                                      "Sensitivity analysis (n=549)", 
+                                                      "ANALYTIC RESULTS",
+                                                      "Effect estimates reported (n=549)", "Uncertainty parameters included (n=454)",
+                                                      "P-value reported (n=549)",
+                                                      "Mention of multiple comparisons (n=549)",
+                                                      "Correction for multiple comparison (n=257)",  
+                                                      "MISCELLANEOUS",
+                                                      "Used Data Exploration and Analysis Portal for analysis (n=549)", "Used machine-learning methods (n=549)", 
+                                                      "Imaging data used in the analysis (n=549)", "Rationale for region-of-interest analysis (n=291)",
+                                                      "Genetics data used in the analysis (n=549)",  
+                                                      "Study pre-registered (n=549)","Generalizability Limitation (n=549)", 
+                                                      "Author contributions (n=549)"))
+
+
+levels(ABCD_Transparency_Numeric$Question)
+###############################
+#the boruta plot was exported to ggplot to improve customization
+#custom function
+plot.Boruta.sel <- function(
+    x,
+    pars = NULL,
+    colCode = c('green','yellow','red','blue'),
+    sort = TRUE,
+    whichShadow = c(FALSE, FALSE, FALSE),
+    col = NULL, xlab = '', ylab = 'Importance', ...) {
+  
+  #Checking arguments
+  if(class(x)!='Boruta')
+    stop('This function needs Boruta object as an argument.');
+  if(is.null(x$ImpHistory))
+    stop('Importance history was not stored during the Boruta run.');
+  
+  #Removal of -Infs and conversion to a list
+  lz <- lapply(1:ncol(x$ImpHistory), function(i)
+    x$ImpHistory[is.finite(x$ImpHistory[,i]),i]);
+  colnames(x$ImpHistory)->names(lz);
+  
+  #Selection of shadow meta-attributes
+  numShadow <- sum(whichShadow);
+  lz <- lz[c(rep(TRUE,length(x$finalDecision)), whichShadow)];
+  
+  #Generating color vector
+  col <- generateCol(x, colCode, col, numShadow);
+  
+  #Ordering boxes due to attribute median importance
+  if (sort) {
+    ii <- order(sapply(lz, stats::median));
+    lz <- lz[ii];
+    col <- col[ii];
+  }
+  
+  # Select parameters of interest
+  if (!is.null(pars)) lz <- lz[names(lz) %in% pars];
+  
+  #Final plotting
+  graphics::boxplot(lz, xlab = xlab, ylab = ylab, col = col, ...);
+  invisible(x);
+}
+
+x11(width=6, height=8)
+
+plot.Boruta.sel(Boruta_x, pars = c("Machine_Learning", "Author_Contributions", "Code_Shared","Code_Link","Sensitivity_Analysis",
+                                   "Uncertainty_Parameter", "Explanation_Age", "Explanation_Race", "Proportion_MissingData", "Number_Excluded",
+                                   "Table_One", "Number_Included", "ABCD_Visits", "ABCD_Version", "Effect_Reported", "DEAP_Used",
+                                   "Table_One"), cex.axis=0.9, las=1)
+
+x11(width=6, height=12)
+plot(Boruta_x, cex.axis=.5, las=2, xlab="", main="Variable Importance")
+
+png(filename="figure.png", width=900, bg="white")
+axis(2, at=1:3, lab=c("elephant", "hippo", "snorkel"), las=1, cex.axis=1.3)
+dev.off()
+#resizing
+windows.options(width=5, height=5)
+dev.off()
+windows.options(reset=TRUE)
+plot(Boruta_x)
+
+############################
+ 
