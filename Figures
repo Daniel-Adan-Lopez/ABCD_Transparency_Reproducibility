@@ -1,0 +1,96 @@
+##### Plotting individual variables to examine distributions
+count <- table(ABCD_e$Completeness_4)
+
+p <-     ggplot(ABCD_e, aes(x = Completeness_4)) +                
+  geom_bar(fill = "gray", color = "black", width = 0.5)+
+  geom_text(stat='count', aes(label=..count..), vjust=-1)+
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
+
+p+theme_classic() +  ggtitle("Level of completeness scores in papers that analyzed ABCD Study data (n=549)")+
+  xlab("Completeness Score")+theme(plot.title = element_text(hjust = 0.5, size=20), axis.title.x = element_text(size=16), axis.title.y = element_text(size=16))
+
+
+#Figure 2 creation
+
+process_the_Boruta_data <- function(x, whichShadow=c(FALSE,FALSE,FALSE),
+                                    colCode=c('green','yellow','red','blue'),
+                                    col=NULL) {
+  if(is.null(x$ImpHistory))
+    stop('Importance history was not stored during the Boruta run.')
+  
+  #Removal of -Infs and conversion to a list
+  lz <- lapply(1:ncol(x$ImpHistory),
+               function(i) x$ImpHistory[is.finite(x$ImpHistory[,i]),i])
+  colnames(x$ImpHistory) -> names(lz)
+  
+  #Selection of shadow meta-attributes
+  numShadow <- sum(whichShadow)
+  lz[c(rep(TRUE,length(x$finalDecision)),whichShadow)] -> lz
+  
+  generateCol<-function(x,colCode,col,numShadow){
+    #Checking arguments
+    if(is.null(col) & length(colCode)!=4)
+      stop('colCode should have 4 elements.')
+    #Generating col
+    if(is.null(col)){
+      rep(colCode[4],length(x$finalDecision)+numShadow)->cc
+      cc[c(x$finalDecision=='Confirmed',rep(FALSE,numShadow))]<-colCode[1]
+      cc[c(x$finalDecision=='Tentative',rep(FALSE,numShadow))]<-colCode[2]
+      cc[c(x$finalDecision=='Rejected',rep(FALSE,numShadow))]<-colCode[3]
+      col=cc
+    }
+    return(col)
+  }
+  
+  #Generating color vector
+  col <- generateCol(x, colCode, col, numShadow)
+  
+  #Ordering boxes due to attribute median importance
+  ii<-order(sapply(lz,stats::median))
+  lz[ii] -> lz
+  col <- col[ii]
+  lz_df <- do.call(rbind.data.frame, lz)
+  df <- as.data.frame(t(lz_df))
+  names(df) <- names(lz)
+  rownames(df) <- NULL
+  return(df)
+}
+
+# Apply the function:
+clean_Bor.hvo <- process_the_Boruta_data(Boruta_x)
+
+# Plot the data:
+library(tidyverse)
+p<- clean_Bor.hvo %>%
+  pivot_longer(everything()) %>%
+  ggplot(aes(x = fct_reorder(name, value, median), y = value)) +
+  geom_boxplot() +
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_text(angle = 90,
+                                   vjust = 0.5))+
+  scale_x_discrete(labels=c("Genetics_Used" = "Genetics Used", "DEAP_Used"= "DEAP Used",
+                            "ROI_Rationale"="ROI Rationale", "Age_Included" = "Age Included",
+                            "Imaging_Used" = "Imaging Used", "Race_Included" = "Race Included",
+                            "Pvalue_Reported" = "P value", "HHIncome_Included" = "Income Included",
+                            "Sex_Included" = "Sex Included", "Year_Published"="Year Published", 
+                            "Data_Imputation" = "Imputation", "Study_PreRegistered"= "PreRegistered",
+                            "Software_Used"= "Software Used","Skewed_Data"= "Skewed Data", 
+                            "Multiple_Comparisons"= "Multiple Comparisons", "Potential_Outliers"=
+                              "Potential Outliers", "Table_One" = "Demo Table", "Number_Included" =
+                              "N included", "Missing_Mechanism" = "Missing Mechanism", "Goodness_Fit" = 
+                              "Goodness of Fit", "Data_Manipulation" = "Data Manipulation",
+                            "Multiple_Correction" = "Multiple Correction", "ABCD_DOI" = "ABCD DOI",
+                            "ABCD_Visits" = "ABCD Visits", "Reason_Manipulation" = "Manipulation Reason",
+                            "Explanation_Race"= "Race/ethnicity explained", "Effect_EstimateReported"=
+                              "Effect estimate", "Excluded_Demographics"= "Excluded Demographics", 
+                            "Uncertainty_Parameter" = "Uncertainty Parameter", "Code_Shared"="Code Shared",
+                            "Software_Version" = "Software Version", "ABCD_version" = "ABCD Version",
+                            "Code_Link" = "Active Code Link", "Explanation_Sex" = "Sex Explanation",
+                            "Sensitivity_Analysis" = "Sensitivity Analysis", "Explanation_HHIncome" =
+                              "Income Explanation", "Explanation_Age" = "Age Explanation", 
+                            "Proportion_MissingData" = "Proportion Missing Data", "Number_Excluded"=
+                              "N Excluded"))
+
+p + theme(axis.text.x = element_text(size=12, angle=90),
+          axis.text.y = element_text(size=12))
+
