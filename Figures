@@ -9,8 +9,11 @@ p <-     ggplot(ABCD_e, aes(x = Completeness_4)) +
 p+theme_classic() +  ggtitle("Level of completeness scores in papers that analyzed ABCD Study data (n=549)")+
   xlab("Completeness Score")+theme(plot.title = element_text(hjust = 0.5, size=20), axis.title.x = element_text(size=16), axis.title.y = element_text(size=16))
 
-
+###################################################
 #Figure 2 creation
+###################################################
+
+#this is a custom function that allows Boruta plots to be customized using ggplot.
 
 process_the_Boruta_data <- function(x, whichShadow=c(FALSE,FALSE,FALSE),
                                     colCode=c('green','yellow','red','blue'),
