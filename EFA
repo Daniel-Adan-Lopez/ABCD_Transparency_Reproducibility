@@ -1,0 +1,47 @@
+#Code to conduct the exploratory factor analysis using Mplus version 8.0
+
+TITLE: EFA of the Transparency and Reproducibility Extraction Items
+DATA: FILE = "ABCDtransparency.dat";
+listwise=off;
+VARIABLE: 
+NAMES = Code_Shared Code_Link Software_Used Software_Version ABCD_Version ABCD_DOI
+     ABCD_Visits Table_One Number_Included Number_Excluded Excluded_Demographics
+     Proportion_MissingData Missing_Mechanism Explanation_Race Explanation_HHIncome
+     Explanation_Sex Explanation_Age Reason_Manipulation Effect_EstimateReported
+     Uncertainty_Parameter Pvalue_Reported Multiple_Correction Sensitivity_Analysis
+     Goodness_Fit Potential_Outliers Skewed_Data Study_PreRegistered
+     Generalizability_Limitation; 
+MISSING=.;
+
+usevariables are
+Code_Shared Code_Link Software_Used Software_Version ABCD_Version ABCD_DOI
+     ABCD_Visits Table_One Number_Included Number_Excluded Excluded_Demographics
+     Proportion_MissingData Missing_Mechanism Explanation_Race Explanation_HHIncome
+     Explanation_Sex Explanation_Age Reason_Manipulation Effect_EstimateReported
+     Uncertainty_Parameter Pvalue_Reported Multiple_Correction Sensitivity_Analysis
+     Goodness_Fit Potential_Outliers Skewed_Data Study_PreRegistered
+     Generalizability_Limitation; 
+
+categorical = Code_Shared Code_Link Software_Used Software_Version ABCD_Version ABCD_DOI
+     ABCD_Visits Table_One Number_Included Number_Excluded Excluded_Demographics
+     Proportion_MissingData Missing_Mechanism Explanation_Race Explanation_HHIncome
+     Explanation_Sex Explanation_Age Reason_Manipulation Effect_EstimateReported
+     Uncertainty_Parameter Pvalue_Reported Multiple_Correction Sensitivity_Analysis
+     Goodness_Fit Potential_Outliers Skewed_Data Study_PreRegistered
+     Generalizability_Limitation; 
+
+
+Analysis: 
+    type = efa 1 11;
+    rotation=oblimin;
+
+Output:
+    sampstat;
+
+
+Plot:
+    type=plot2;
+
+!savedata:
+ !sample is newdata.dat;
+
