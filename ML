@@ -1,0 +1,89 @@
+#machine-learning using Boruta in R
+
+#sensitivity analysis using machine learning
+
+library(Boruta)
+#does not need to be numeric
+#will only include in the Boruta call the variables that make up the LOC score
+#need to address any NA prior. 
+
+str(ABCD_e)
+colSums(is.na(ABCD_Transparency_and_Reproducibility_Final))
+
+df <- ABCD_Transparency_and_Reproducibility_Final[1:549,c(6,11:48, 51:54, 60)]
+
+df$Year_Published <- as.character(df$Year_Published)
+df[1:43] <- lapply(df[1:43], factor)  ## as.factor() could also be used
+str(df)
+
+####################
+set.seed(123)
+Boruta_x <- Boruta(Completeness_4 ~ Code_Link+Code_Shared+Software_Used+Software_Version+ABCD_Version+ABCD_DOI+ABCD_Visits+Table_One+Number_Included+Number_Excluded+
+                     Excluded_Demographics+Proportion_MissingData+Missing_Mechanism+Explanation_Age+Explanation_HHIncome+Explanation_Race+Explanation_Sex+
+                     Data_Manipulation+Reason_Manipulation+Effect_EstimateReported+Uncertainty_Parameter+Pvalue_Reported+Multiple_Comparisons+Multiple_Correction
+                   +Sensitivity_Analysis+Goodness_Fit+Data_Imputation+DEAP_Used+Potential_Outliers+Skewed_Data+Imaging_Used+ROI_Rationale+Genetics_Used+Study_PreRegistered+
+                     Race_Included+HHIncome_Included+Sex_Included+Age_Included+Year_Published+Machine_Learning+Author_Contributions, data=df,doTrace=2, maxRuns=4000) 
+print(Boruta_x)
+attStats(Boruta_x)
+#                             meanImp  medianImp       minImp    maxImp    normHits  decision
+# Machine_Learning         0.1925483  0.1473608 -2.093581892  2.120064 0.000334672  Rejected
+# Author_Contributions     1.1072061  0.9277240 -0.382690919  2.627738 0.000334672  Rejected
+# Year_Published           6.5197581  6.5203606  3.225198088 10.125385 0.998995984 Confirmed
+# Age_Included             3.1621947  3.2028375 -0.411638320  5.858349 0.758366801 Confirmed
+# Sex_Included             4.7562528  4.7809819  1.132728862  7.497509 0.987282463 Confirmed
+# HHIncome_Included        4.2958704  4.3131730 -0.006295173  7.035901 0.957161981 Confirmed
+# Race_Included            3.6734373  3.6852327  0.952049591  6.956950 0.874497992 Confirmed
+# Study_PreRegistered      7.0424082  7.0569025  4.240733636  9.463047 1.000000000 Confirmed
+# Genetics_Used            2.4992476  2.5396139 -1.203459877  5.556976 0.532128514 Confirmed
+# ROI_Rationale            2.5750243  2.5944816 -0.692249335  6.118316 0.544511379 Confirmed
+# Imaging_Used             3.4920116  3.5110879  0.339885078  7.017765 0.829651941 Confirmed
+# Skewed_Data              7.9038163  7.9066067  4.979342828 10.405128 1.000000000 Confirmed
+# Potential_Outliers       8.5581642  8.5526908  5.743064411 11.046472 1.000000000 Confirmed
+# DEAP_Used                2.5514459  2.5580824 -1.011921716  5.914107 0.549531459 Confirmed
+# Data_Imputation          6.9808991  6.9974366  4.201270153  9.693804 1.000000000 Confirmed
+# Goodness_Fit            10.3150483 10.3172449  7.403687801 13.056038 1.000000000 Confirmed
+# Sensitivity_Analysis    16.4645486 16.4530384 14.292625171 19.966627 1.000000000 Confirmed
+# Multiple_Correction     10.4478598 10.4240313  7.804363655 13.101231 1.000000000 Confirmed
+# Multiple_Comparisons     8.4858977  8.4813014  5.640729196 10.822975 1.000000000 Confirmed
+# Pvalue_Reported          3.8563507  3.8734906  0.721090002  6.516437 0.900267738 Confirmed
+# Uncertainty_Parameter   14.3792975 14.3828718 11.465250067 16.844230 1.000000000 Confirmed
+# Effect_EstimateReported 12.6779762 12.6701587 10.071412226 15.152143 1.000000000 Confirmed
+# Reason_Manipulation     12.5981980 12.5914722 10.208201761 15.624334 1.000000000 Confirmed
+# Data_Manipulation       10.3678890 10.3698129  8.044969126 12.917381 1.000000000 Confirmed
+# Explanation_Sex         16.4688842 16.4657099 13.671358870 19.232151 1.000000000 Confirmed
+# Explanation_Race        12.6734481 12.6626606  9.968879731 16.125835 1.000000000 Confirmed
+# Explanation_HHIncome    16.9888687 16.9614576 14.589301461 19.823422 1.000000000 Confirmed
+# Explanation_Age         17.4540812 17.4316789 15.135183974 19.967070 1.000000000 Confirmed
+# Missing_Mechanism       10.1160937 10.1213475  7.924884749 12.727925 1.000000000 Confirmed
+# Proportion_MissingData  20.6635170 20.6544559 18.437869984 23.336505 1.000000000 Confirmed
+# Excluded_Demographics   13.7402241 13.7388197 11.454402367 16.442040 1.000000000 Confirmed
+# Number_Excluded         23.8902782 23.8762301 21.205961351 26.431632 1.000000000 Confirmed
+# Number_Included          9.0412940  9.0466265  6.648704070 11.282296 1.000000000 Confirmed
+# Table_One                8.7655989  8.7586546  6.078453313 11.435489 1.000000000 Confirmed
+# ABCD_Visits             11.7158642 11.6971817  9.169341404 14.499458 1.000000000 Confirmed
+# ABCD_DOI                10.7556019 10.7445886  8.105968906 13.398577 1.000000000 Confirmed
+# ABCD_Version            15.2144995 15.1965050 12.320925388 18.618191 1.000000000 Confirmed
+# Software_Version        14.9792329 14.9810457 12.216433534 18.089087 1.000000000 Confirmed
+# Software_Used            7.8448767  7.8543865  5.188971132 10.006107 1.000000000 Confirmed
+# Code_Shared             14.9103982 14.8919533 12.456020020 17.121067 1.000000000 Confirmed
+# Code_Link               16.2862299 16.2948159 13.320289727 19.237888 1.000000000 Confirmed
+
+boruta_signif <- names(Boruta_x$finalDecision[Boruta_x$finalDecision %in% c("Confirmed", "Tentative")]) 
+print(boruta_signif)
+
+plot(Boruta_x, cex.axis=.6, las=2, xlab="", main="Variable Importance")
+
+
+stats <- attStats(Boruta_x)
+
+write.csv(stats, file="stats.csv")
+
+#other stats using boruta
+
+getSelectedAttributes(Boruta_x, withTentative = F)
+
+bor <- TentativeRoughFix(Boruta_x)
+
+getNonRejectedFormula(Boruta_x)
+
+plot(Boruta_x, las = 2, cex.axis = 0.5) # cex.axis is used to reduce the font size
